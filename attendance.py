@@ -3,7 +3,6 @@ import numpy as np
 import face_recognition
 import os
 import constants
-# from constants import ATTENDANCE_FILE, EMPLOYEE_DIR, ENCODING_DIR, WHITE, NEON_GREEN, MIN_DURATION
 from constants import *
 import heapq
 from datetime import datetime
