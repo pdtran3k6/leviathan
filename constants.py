@@ -1,0 +1,6 @@
+EMPLOYEE_DIR = "Images"
+ENCODING_DIR = "Encodings"
+WHITE = (255,255,255)
+NEON_GREEN = (0,255,0)
+MIN_DURATION = 10
+ATTENDANCE_FILE = "attendance.data"
