@@ -130,3 +130,11 @@ dmypy.json
 
 # MacOS
 .DS_Store
+
+# Program's output
+*.csv
+*.data
+
+# Images/Encodings folder
+Images/
+Encodings/
