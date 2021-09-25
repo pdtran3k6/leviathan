@@ -11,7 +11,7 @@ $ python3 encodeImages.py
 ```
 $ python3 attendance.py
 ```
-4. Print attendance data
+4. Print attendance data / Export to CSV format
 ```
-$ python3 loadAttendance.py
+$ python3 exportCSV.py
 ```
