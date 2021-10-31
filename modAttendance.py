@@ -1,7 +1,8 @@
-import os
 from constants import ATTENDANCE_RAW, ATTENDANCE_CSV
-import pickle
+
 import datetime as dt
+import os
+import pickle
 import random
 
 def modAttendance():

@@ -1,4 +1,4 @@
-from constants import ATTENDANCE_RAW, MIN_DURATION, EMPLOYEE_DIR, ENCODING_DIR
+from constants import *
 from helper import fetchNames, fetchEncodings
 
 import cv2
@@ -24,8 +24,8 @@ class AttendanceApp:
     btn.pack(fill="both", expand=True, padx=10, pady=10)
 
     self.writer = threading.Thread(target=self.writeData, args=[writeInterval])
-    self.stopCondition = threading.Condition()
-    self.stopWriterThread = False
+    self.writeCv = threading.Condition()
+    self.isWriteStopped = False
     self.writer.start()
 
     self.attendance = dict()
@@ -75,13 +75,12 @@ class AttendanceApp:
   def writeData(self, timeInterval):
     # TODO: #OPTIMIZATION avoid rewriting the whole object
     # Write only the deltas from previous state
-    self.stopCondition.acquire()
-    while not self.stopWriterThread:
-      print("writing data...")
-      with open(ATTENDANCE_RAW, "wb") as f:
-        pickle.dump(self.attendance, f, pickle.HIGHEST_PROTOCOL)
-      self.stopCondition.wait(timeout=timeInterval)
-    self.stopCondition.release()
+    with self.writeCv:
+      while not self.isWriteStopped:
+        print("WRITING DATA")
+        with open(ATTENDANCE_RAW, "wb") as f:
+          pickle.dump(self.attendance, f, pickle.HIGHEST_PROTOCOL)
+        self.writeCv.wait(timeout=timeInterval)
 
   def confirm(self):
     # Employee confirm their entrance/exit time
@@ -92,21 +91,20 @@ class AttendanceApp:
       else:  
         if (curTime - self.attendance[self.curEmployee][-1]).total_seconds() > MIN_DURATION:
           self.attendance[self.curEmployee].append(curTime)
+
       # Force update
-      self.stopCondition.acquire()
-      print("updating data...")
-      with open(ATTENDANCE_RAW, "wb") as f:
-        pickle.dump(self.attendance, f, pickle.HIGHEST_PROTOCOL)
-      self.stopCondition.release()
-    
+      with self.writeCv:
+        print("UPDATE REQUEST")
+        self.writeCv.notify()
+
   def onClose(self):
     self.vs.release()
     self.root.after_cancel(self.videoLoopId)
     self.root.destroy()
-    self.stopWriterThread = True
-    self.stopCondition.acquire()
-    self.stopCondition.notifyAll()
-    self.stopCondition.release()
+    self.isWriteStopped = True
+    with self.writeCv:
+      print("SHUTDOWN WRITER")
+      self.writeCv.notify()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":

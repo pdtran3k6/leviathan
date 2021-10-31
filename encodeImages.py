@@ -1,8 +1,8 @@
 from constants import EMPLOYEE_DIR, ENCODING_DIR
 
 import cv2
-import numpy as np
 import face_recognition
+import numpy as np
 import os
 
 def encodeImages(empDir, encDir):
